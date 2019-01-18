@@ -14,6 +14,7 @@ class BqexApi(object):
         self.secret_key = AppKey
         self.api_key = AppSecret
         self.uid = UID
+        self.coin_name = 'usdt_eth'
 
 
     # 获取所有市场的报价
@@ -30,48 +31,48 @@ class BqexApi(object):
         return data
 
     # 获取公共交易历史
-    def trade_history(self,coin_name):
+    def trade_history(self):
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "Cookie": "Pycharm-26c2d973=dbb9b300-2483-478f-9f5a-16ca4580177e; Hm_lvt_98b9d8c2fd6608d564bf2ac2ae642948=1512607763; Pycharm-26c2d974=f645329f-338e-486c-82c2-29e2a0205c74; _xsrf=2|d1a3d8ea|c5b07851cbce048bd5453846445de19d|1522379036"}
         params = {
-            'coins': coin_name,
+            'coins': self.coin_name,
             'limit': 50
         }
         # data_json = json.dumps(params)
         url = 'https://www.bqex.pro/polarisex/quote/tradeHistory'
         data = requests.get(url, headers=headers, params=params)
         if data.status_code != 200:
-            data = self.trade_history(coin_name)
+            data = self.trade_history()
             return data
         data = data.content.decode()
         return data
 
     # 获取交易深度
-    def trade_depth(self,coin_name):
+    def trade_depth(self):
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "Cookie": "Pycharm-26c2d973=dbb9b300-2483-478f-9f5a-16ca4580177e; Hm_lvt_98b9d8c2fd6608d564bf2ac2ae642948=1512607763; Pycharm-26c2d974=f645329f-338e-486c-82c2-29e2a0205c74; _xsrf=2|d1a3d8ea|c5b07851cbce048bd5453846445de19d|1522379036"}
         params = {
-            'coins': coin_name,
+            'coins': self.coin_name,
             'limit': 50
         }
         # data_json = json.dumps(params)
         url = 'https://www.bqex.pro/polarisex/quote/tradeDeepin'
         data = requests.get(url, headers=headers, params=params)
         if data.status_code != 200:
-            data = self.trade_depth(coin_name)
+            data = self.trade_depth()
             return data
         data = data.content.decode()
         return data
 
     # 获取k线数据
-    def trade_kline(self,coin_name):
+    def trade_kline(self):
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "Cookie": "Pycharm-26c2d973=dbb9b300-2483-478f-9f5a-16ca4580177e; Hm_lvt_98b9d8c2fd6608d564bf2ac2ae642948=1512607763; Pycharm-26c2d974=f645329f-338e-486c-82c2-29e2a0205c74; _xsrf=2|d1a3d8ea|c5b07851cbce048bd5453846445de19d|1522379036"}
         params = {
-            'symbol': coin_name,
+            'symbol': self.coin_name,
             'type':1,
             'limit': 2000,
             'startTime': int(time.time() - 1) * 1000,
@@ -82,24 +83,24 @@ class BqexApi(object):
         url = 'https://www.bqex.pro/polarisex/quote/tradeDeepin'
         data = requests.get(url, headers=headers, params=params)
         if data.status_code != 200:
-            data = self.trade_kline(coin_name)
+            data = self.trade_kline()
             return data
         data = data.content.decode()
         return data
 
     # 获取实时交易信息
-    def trade_real(self,coin_name):
+    def trade_real(self):
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "Cookie": "Pycharm-26c2d973=dbb9b300-2483-478f-9f5a-16ca4580177e; Hm_lvt_98b9d8c2fd6608d564bf2ac2ae642948=1512607763; Pycharm-26c2d974=f645329f-338e-486c-82c2-29e2a0205c74; _xsrf=2|d1a3d8ea|c5b07851cbce048bd5453846445de19d|1522379036"}
         params = {
-            'coins': coin_name
+            'coins': self.coin_name
         }
         # data_json = json.dumps(params)
         url = 'https://www.bqex.pro/polarisex/quote/realTime'
         data = requests.get(url, headers=headers, params=params)
         if data.status_code != 200:
-            data = self.trade_real(coin_name)
+            data = self.trade_real()
             return data
         data = data.content.decode()
         return data
@@ -145,7 +146,7 @@ class BqexApi(object):
         }
         # sign = self.sign_in(method=method,url=path,params=params)
         # ['api_key', 'buy_or_sell', 'num', 'price', 'sign', 'source', 'symbol', 'type', 'uid']
-        url_str = 'api_key=' + AppKey + '&buy_or_sell=1'+'&num='+str(amount)+'&price='+str(price)+'&source=1&symbol=usdt_eth&type=1&uid='+str(UID)+'&secret_key=' + AppSecret
+        url_str = 'api_key=' + AppKey + '&buy_or_sell=1'+'&num='+str(amount)+'&price='+str(price)+'&source=1&symbol='+self.coin_name+'&type=1&uid='+str(UID)+'&secret_key=' + AppSecret
         print(url_str)
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
 
@@ -160,7 +161,7 @@ class BqexApi(object):
             'num':amount,
             'source':1,
             'sign': sign,
-            'symbol': 'usdt_eth',
+            'symbol': self.coin_name,
             'type':1,
         }
         headers = {
@@ -189,7 +190,7 @@ class BqexApi(object):
         }
         # sign = self.sign_in(method=method,url=path,params=params)
         # ['api_key', 'buy_or_sell', 'num', 'price', 'sign', 'source', 'symbol', 'type', 'uid']
-        url_str = 'api_key=' + AppKey + '&buy_or_sell=2'+'&num='+str(amount)+'&price='+str(price)+'&source=1&symbol=usdt_eth&type=1&uid='+str(UID)+'&secret_key=' + AppSecret
+        url_str = 'api_key=' + AppKey + '&buy_or_sell=2'+'&num='+str(amount)+'&price='+str(price)+'&source=1&symbol='+self.coin_name+'&type=1&uid='+str(UID)+'&secret_key=' + AppSecret
         print(url_str)
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
 
@@ -204,7 +205,7 @@ class BqexApi(object):
             'num':amount,
             'source':1,
             'sign': sign,
-            'symbol': 'usdt_eth',
+            'symbol': self.coin_name,
             'type':1,
         }
         headers = {
@@ -272,7 +273,7 @@ class BqexApi(object):
             'secret_key': AppSecret
         }
         # sign = self.sign_in(method=method,url=path,params=params)
-        url_str = 'api_key=' + AppKey + '&symbol=usdt_eth&uid=' + str(UID) + '&secret_key=' + AppSecret
+        url_str = 'api_key=' + AppKey + '&symbol='+self.coin_name+'&uid=' + str(UID) + '&secret_key=' + AppSecret
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
 
         print(sign)
@@ -282,7 +283,7 @@ class BqexApi(object):
             'uid': UID,
             'api_key': AppKey,
             'sign': sign,
-            'symbol':'usdt_eth'
+            'symbol':self.coin_name
         }
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
@@ -349,7 +350,7 @@ class BqexApi(object):
         }
         # sign = self.sign_in(method=method,url=path,params=params)
         # ['api_key', 'buy_or_sell', 'num', 'price', 'sign', 'source', 'symbol', 'type', 'uid']
-        url_str = 'api_key=' + AppKey + '&size=10&symbol=usdt_eth&uid='+str(UID)+'&secret_key=' + AppSecret
+        url_str = 'api_key=' + AppKey + '&size=10&symbol='+self.coin_name+'&uid='+str(UID)+'&secret_key=' + AppSecret
         print(url_str)
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
 
@@ -361,7 +362,7 @@ class BqexApi(object):
             'size':10,
             'api_key': AppKey,
             'sign': sign,
-            'symbol': 'usdt_eth',
+            'symbol': self.coin_name,
         }
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
@@ -401,7 +402,7 @@ class BqexApi(object):
             'api_key': AppKey,
             'order_no':order_no,
             'sign': sign,
-            'symbol': 'usdt_eth',
+            'symbol': self.coin_name,
         }
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
@@ -421,13 +422,13 @@ class BqexApi(object):
     # 成交记录
     def trade_order(self):
         path = '/authlib/tradeOrder'
-        url_str = 'api_key=' + AppKey +'&symbol=ada_eth'+'&uid=' + str(UID)+ '&secret_key=' + AppSecret
+        url_str = 'api_key=' + AppKey +'&symbol='+self.coin_name+'&uid=' + str(UID)+ '&secret_key=' + AppSecret
         print(url_str)
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
         params = {
             'uid': UID,
             'api_key': AppKey,
-            'symbol':'ada_eth',
+            'symbol':self.coin_name,
             'sign': sign
         }
         headers = {
@@ -503,17 +504,19 @@ if __name__ == '__main__':
     # data = bqex.authlib_quote()
 
     # 下买单
-    # data = bqex.order_buy(price=40,amount=1)
+    # data = bqex.order_buy(price=40,amount=0.001)
 
     # 下卖单
-    # data = bqex.order_sell(price=300,amount=1)
+    # data = bqex.order_sell(price=1000,amount=0.001)
 
     # 撤单
-    # data = bqex.cancel_order('4565482')
+    # data = bqex.cancel_order('15478739913918560907921100372001')
 
     # 获取未成交单
     # data = bqex.untrade_order()
 
     # 获取交易单状态
-    data = bqex.order_status('456787464')
+    data = bqex.order_status('15478739913918560907921100372001')
+
+
     print(data)
