@@ -6,15 +6,15 @@ import hashlib
 import base64
 from urllib import parse
 
-from content_safe import *
+from .content_safe import *
 
 
 class BqexApi(object):
-    def __init__(self):
+    def __init__(self,coin_name='usdt_trin'):
         self.secret_key = AppKey
         self.api_key = AppSecret
         self.uid = UID
-        self.coin_name = 'usdt_eth'
+        self.coin_name = coin_name
 
 
     # 获取所有市场的报价
@@ -22,15 +22,16 @@ class BqexApi(object):
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "Cookie": "Pycharm-26c2d973=dbb9b300-2483-478f-9f5a-16ca4580177e; Hm_lvt_98b9d8c2fd6608d564bf2ac2ae642948=1512607763; Pycharm-26c2d974=f645329f-338e-486c-82c2-29e2a0205c74; _xsrf=2|d1a3d8ea|c5b07851cbce048bd5453846445de19d|1522379036"}
-        url = 'https://www.bqex.pro/polarisex/quote/public'
+        url = API_BASE+'/polarisex/quote/public'
         data = requests.get(url, headers=headers)
+        # print(data)
         if data.status_code != 200:
             data = self.all_market_price()
             return data
         data = data.content.decode()
         return data
 
-    # 获取公共交易历史
+    # 获取公共交易历史{"date":"1551153449689","price":137.84,"amount":638.75,"number"下单数量:4.634,"coinCode":3,"baseCurrencyId":4,"tid":"15511534496891280901281000396104","type":"buy","buyOrSellTrade":1}
     def trade_history(self):
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
@@ -40,7 +41,7 @@ class BqexApi(object):
             'limit': 50
         }
         # data_json = json.dumps(params)
-        url = 'https://www.bqex.pro/polarisex/quote/tradeHistory'
+        url = API_BASE+'/polarisex/quote/tradeHistory'
         data = requests.get(url, headers=headers, params=params)
         if data.status_code != 200:
             data = self.trade_history()
@@ -55,10 +56,10 @@ class BqexApi(object):
             "Cookie": "Pycharm-26c2d973=dbb9b300-2483-478f-9f5a-16ca4580177e; Hm_lvt_98b9d8c2fd6608d564bf2ac2ae642948=1512607763; Pycharm-26c2d974=f645329f-338e-486c-82c2-29e2a0205c74; _xsrf=2|d1a3d8ea|c5b07851cbce048bd5453846445de19d|1522379036"}
         params = {
             'coins': self.coin_name,
-            'limit': 50
+            'limit': 100
         }
         # data_json = json.dumps(params)
-        url = 'https://www.bqex.pro/polarisex/quote/tradeDeepin'
+        url = API_BASE+'/polarisex/quote/tradeDeepin'
         data = requests.get(url, headers=headers, params=params)
         if data.status_code != 200:
             data = self.trade_depth()
@@ -72,7 +73,7 @@ class BqexApi(object):
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "Cookie": "Pycharm-26c2d973=dbb9b300-2483-478f-9f5a-16ca4580177e; Hm_lvt_98b9d8c2fd6608d564bf2ac2ae642948=1512607763; Pycharm-26c2d974=f645329f-338e-486c-82c2-29e2a0205c74; _xsrf=2|d1a3d8ea|c5b07851cbce048bd5453846445de19d|1522379036"}
         params = {
-            'symbol': self.coin_name,
+            'coins': self.coin_name,
             'type':1,
             'limit': 2000,
             'startTime': int(time.time() - 1) * 1000,
@@ -80,8 +81,9 @@ class BqexApi(object):
 
         }
         # data_json = json.dumps(params)
-        url = 'https://www.bqex.pro/polarisex/quote/tradeDeepin'
+        url = API_BASE+'/polarisex/quote/tradeDeepin'
         data = requests.get(url, headers=headers, params=params)
+        # print(data)
         if data.status_code != 200:
             data = self.trade_kline()
             return data
@@ -97,7 +99,7 @@ class BqexApi(object):
             'coins': self.coin_name
         }
         # data_json = json.dumps(params)
-        url = 'https://www.bqex.pro/polarisex/quote/realTime'
+        url = API_BASE+'/polarisex/quote/realTime'
         data = requests.get(url, headers=headers, params=params)
         if data.status_code != 200:
             data = self.trade_real()
@@ -111,7 +113,7 @@ class BqexApi(object):
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "Cookie": "Pycharm-26c2d973=dbb9b300-2483-478f-9f5a-16ca4580177e; Hm_lvt_98b9d8c2fd6608d564bf2ac2ae642948=1512607763; Pycharm-26c2d974=f645329f-338e-486c-82c2-29e2a0205c74; _xsrf=2|d1a3d8ea|c5b07851cbce048bd5453846445de19d|1522379036"}
         # data_json = json.dumps(params)
-        url = 'https://www.bqex.pro/polarisex/quote/public'
+        url = API_BASE+'/polarisex/quote/public'
         data = requests.get(url, headers=headers)
         # print(data.status_code,type(data.status_code))
         if data.status_code != 200:
@@ -125,13 +127,13 @@ class BqexApi(object):
     def sign_in(self,method,url,params):
         # url_str = parse.urlencode(params, 'utf-8')
         url_str = 'api_key='+AppKey+'&uid='+str(UID)+'&secret_key='+AppSecret
-        print(url_str)
+        # print(url_str)
 
         # url_str = parse.quote_plus(method.upper() + str(url) + '?' + url_str)
         # print(url_str)
         # no_base64 = (hmac.new(AppSecret.encode("UTF-8"), url_str.encode("utf-8"), hashlib.md5).hexdigest())
         no_base64 = hashlib.md5(url_str.encode("utf-8")).hexdigest()
-        print(no_base64)
+        # print(no_base64)
         # data = base64.b64encode((hmac.new(AppSecret.encode("UTF-8"), url_str.encode("utf-8"), hashlib.sha256).hexdigest()).encode())
         return no_base64.upper()
 
@@ -147,10 +149,10 @@ class BqexApi(object):
         # sign = self.sign_in(method=method,url=path,params=params)
         # ['api_key', 'buy_or_sell', 'num', 'price', 'sign', 'source', 'symbol', 'type', 'uid']
         url_str = 'api_key=' + AppKey + '&buy_or_sell=1'+'&num='+str(amount)+'&price='+str(price)+'&source=1&symbol='+self.coin_name+'&type=1&uid='+str(UID)+'&secret_key=' + AppSecret
-        print(url_str)
+        # print(url_str)
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
 
-        print(sign)
+        # print(sign)
         # app_key = parse.urlencode(AppKey)
         # print(app_key)
         params_data = {
@@ -173,9 +175,9 @@ class BqexApi(object):
         # url = API_BASE+path+'?'+parse.urlencode(params_data)
         # url = API_BASE+path+'?'+'api_key='+AppKey+'&uid='+str(UID)+'&sign='+sign
         url = API_BASE + path
-        print(url)
+        # print(url)
         data = requests.post(url=url, data=params_data, headers=headers)
-        print(data)
+        # print(data)
         data = data.content.decode()
         return data
 
@@ -191,10 +193,10 @@ class BqexApi(object):
         # sign = self.sign_in(method=method,url=path,params=params)
         # ['api_key', 'buy_or_sell', 'num', 'price', 'sign', 'source', 'symbol', 'type', 'uid']
         url_str = 'api_key=' + AppKey + '&buy_or_sell=2'+'&num='+str(amount)+'&price='+str(price)+'&source=1&symbol='+self.coin_name+'&type=1&uid='+str(UID)+'&secret_key=' + AppSecret
-        print(url_str)
+        # print(url_str)
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
 
-        print(sign)
+        # print(sign)
         # app_key = parse.urlencode(AppKey)
         # print(app_key)
         params_data = {
@@ -217,9 +219,9 @@ class BqexApi(object):
         # url = API_BASE+path+'?'+parse.urlencode(params_data)
         # url = API_BASE+path+'?'+'api_key='+AppKey+'&uid='+str(UID)+'&sign='+sign
         url = API_BASE + path
-        print(url)
+        # print(url)
         data = requests.post(url=url, data=params_data, headers=headers)
-        print(data)
+        # print(data)
         data = data.content.decode()
         return data
 
@@ -236,10 +238,10 @@ class BqexApi(object):
         # sign = self.sign_in(method=method,url=path,params=params)
         # ['api_key', 'buy_or_sell', 'num', 'price', 'sign', 'source', 'symbol', 'type', 'uid']
         url_str = 'api_key=' + AppKey +'&order_no='+str(order_no)+'&uid='+str(UID)+'&secret_key=' + AppSecret
-        print(url_str)
+        # print(url_str)
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
 
-        print(sign)
+        # print(sign)
         # app_key = parse.urlencode(AppKey)
         # print(app_key)
         params_data = {
@@ -257,9 +259,9 @@ class BqexApi(object):
         # url = API_BASE+path+'?'+parse.urlencode(params_data)
         # url = API_BASE+path+'?'+'api_key='+AppKey+'&uid='+str(UID)+'&sign='+sign
         url = API_BASE + path
-        print(url)
+        # print(url)
         data = requests.post(url=url, data=params_data, headers=headers)
-        print(data)
+        # print(data)
         data = data.content.decode()
         return data
 
@@ -276,7 +278,7 @@ class BqexApi(object):
         url_str = 'api_key=' + AppKey + '&symbol='+self.coin_name+'&uid=' + str(UID) + '&secret_key=' + AppSecret
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
 
-        print(sign)
+        # print(sign)
         # app_key = parse.urlencode(AppKey)
         # print(app_key)
         params_data = {
@@ -294,9 +296,9 @@ class BqexApi(object):
         # url = API_BASE+path+'?'+parse.urlencode(params_data)
         # url = API_BASE+path+'?'+'api_key='+AppKey+'&uid='+str(UID)+'&sign='+sign
         url = API_BASE + path
-        print(url)
+        # print(url)
         data = requests.post(url=url, data=params_data, headers=headers)
-        print(data)
+        # print(data)
         data = data.content.decode()
         return data
 
@@ -316,7 +318,7 @@ class BqexApi(object):
         url_str = 'api_key='+AppKey+'&uid='+str(UID)+'&secret_key='+AppSecret
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
 
-        print(sign)
+        # print(sign)
         # app_key = parse.urlencode(AppKey)
         # print(app_key)
         params_data = {
@@ -333,9 +335,9 @@ class BqexApi(object):
         # url = API_BASE+path+'?'+parse.urlencode(params_data)
         # url = API_BASE+path+'?'+'api_key='+AppKey+'&uid='+str(UID)+'&sign='+sign
         url = API_BASE+path
-        print(url)
+        # print(url)
         data = requests.post(url=url,data=params_data,headers=headers)
-        print(data)
+        # print(data)
         data = data.content.decode()
         return data
 
@@ -350,16 +352,16 @@ class BqexApi(object):
         }
         # sign = self.sign_in(method=method,url=path,params=params)
         # ['api_key', 'buy_or_sell', 'num', 'price', 'sign', 'source', 'symbol', 'type', 'uid']
-        url_str = 'api_key=' + AppKey + '&size=10&symbol='+self.coin_name+'&uid='+str(UID)+'&secret_key=' + AppSecret
-        print(url_str)
+        url_str = 'api_key=' + AppKey + '&size=1000&symbol='+self.coin_name+'&uid='+str(UID)+'&secret_key=' + AppSecret
+        # print(url_str)
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
 
-        print(sign)
+        # print(sign)
         # app_key = parse.urlencode(AppKey)
         # print(app_key)
         params_data = {
             'uid': UID,
-            'size':10,
+            'size':1000,
             'api_key': AppKey,
             'sign': sign,
             'symbol': self.coin_name,
@@ -373,9 +375,9 @@ class BqexApi(object):
         # url = API_BASE+path+'?'+parse.urlencode(params_data)
         # url = API_BASE+path+'?'+'api_key='+AppKey+'&uid='+str(UID)+'&sign='+sign
         url = API_BASE + path
-        print(url)
+        # print(url)
         data = requests.post(url=url, data=params_data, headers=headers)
-        print(data)
+        # print(data)
         data = data.content.decode()
         return data
 
@@ -391,10 +393,10 @@ class BqexApi(object):
         # sign = self.sign_in(method=method,url=path,params=params)
         # ['api_key', 'buy_or_sell', 'num', 'price', 'sign', 'source', 'symbol', 'type', 'uid']
         url_str = 'api_key=' + AppKey +'&order_no='+order_no+'&uid='+str(UID)+'&secret_key=' + AppSecret
-        print(url_str)
+        # print(url_str)
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
 
-        print(sign)
+        # print(sign)
         # app_key = parse.urlencode(AppKey)
         # print(app_key)
         params_data = {
@@ -402,7 +404,7 @@ class BqexApi(object):
             'api_key': AppKey,
             'order_no':order_no,
             'sign': sign,
-            'symbol': self.coin_name,
+            'symbol': 'usdt_eth',
         }
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
@@ -413,17 +415,17 @@ class BqexApi(object):
         # url = API_BASE+path+'?'+parse.urlencode(params_data)
         # url = API_BASE+path+'?'+'api_key='+AppKey+'&uid='+str(UID)+'&sign='+sign
         url = API_BASE + path
-        print(url)
+        # print(url)
         data = requests.post(url=url, data=params_data, headers=headers)
-        print(data)
+        # print(data)
         data = data.content.decode()
         return data
 
     # 成交记录
     def trade_order(self):
         path = '/authlib/tradeOrder'
-        url_str = 'api_key=' + AppKey +'&symbol='+self.coin_name+'&uid=' + str(UID)+ '&secret_key=' + AppSecret
-        print(url_str)
+        url_str = 'api_key=' + AppKey +'&symbol=ada_eth'+'&uid=' + str(UID)+ '&secret_key=' + AppSecret
+        # print(url_str)
         sign = hashlib.md5(url_str.encode("utf-8")).hexdigest().upper()
         params = {
             'uid': UID,
@@ -437,7 +439,7 @@ class BqexApi(object):
             # "Authorization": sign
         }
         url = API_BASE + path
-        print(url)
+        # print(url)
         data = requests.post(url=url, data=params, headers=headers)
         data = data.content.decode()
         return data
@@ -458,14 +460,14 @@ class BqexApi(object):
             "Cookie": "Pycharm-26c2d973=dbb9b300-2483-478f-9f5a-16ca4580177e; Hm_lvt_98b9d8c2fd6608d564bf2ac2ae642948=1512607763; Pycharm-26c2d974=f645329f-338e-486c-82c2-29e2a0205c74; _xsrf=2|d1a3d8ea|c5b07851cbce048bd5453846445de19d|1522379036",
         }
         url = API_BASE+path
-        print(url)
+        # print(url)
         data = requests.post(url=url,data=params,headers=headers)
         data = data.content.decode()
         return data
 
     # 获取所有币种 right
     def coin_coins(self):
-        url = 'https://www.bqex.pro/polarisex/coin/coins'
+        url = API_BASE+'/polarisex/coin/coins'
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "Cookie": "Pycharm-26c2d973=dbb9b300-2483-478f-9f5a-16ca4580177e; Hm_lvt_98b9d8c2fd6608d564bf2ac2ae642948=1512607763; Pycharm-26c2d974=f645329f-338e-486c-82c2-29e2a0205c74; _xsrf=2|d1a3d8ea|c5b07851cbce048bd5453846445de19d|1522379036",
@@ -477,46 +479,48 @@ class BqexApi(object):
 
 
 if __name__ == '__main__':
-    bqex = BqexApi()
+    bqex = BqexApi('usdt_trin')
 
     # 获取所有市场的报价
     # data = bqex.all_market_price()
 
     # 获取交易历史
-    # data = bqex.trade_history("usdt_btc")
+    # data = bqex.trade_history()
 
     # 获取交易深度
-    # data = bqex.trade_depth('usdt_btc')
+    # data = bqex.trade_depth()
 
-    # 获取k线数据
-    # data = bqex.trade_depth('usdt_btc')
+    # 获取k线数据 失败
+    # data = bqex.trade_kline()
 
     # 获取实时交易信息
-    # data = bqex.trade_real('usdt_btc')
+    # data = bqex.trade_real()
 
     # 获取交易对信息
-    # data = bqex.trade_order()
+    # data = bqex.trade_pairs()
 
     # 获取账号
     # data = bqex.get_auth()
 
-    # 获取深度quote
+    # 获取深度quote 没用
     # data = bqex.authlib_quote()
 
     # 下买单
-    # data = bqex.order_buy(price=40,amount=0.001)
+    # data = bqex.order_buy(price=325,amount=1)
 
-    # 下卖单
-    # data = bqex.order_sell(price=1000,amount=0.001)
+    # 下卖单{"attachment":"15511547188257080902781100334975","status":200,"message":null}
+    #{"attachment":"15518362164932170908681107396772","status":200,"message":null}未撤单**
+    data = bqex.order_sell(price=0.00463,amount=1000)
 
     # 撤单
-    # data = bqex.cancel_order('15478739913918560907921100372001')
+    # data = bqex.cancel_order('15513434477835380908671107312315')
 
     # 获取未成交单
     # data = bqex.untrade_order()
 
-    # 获取交易单状态
-    data = bqex.order_status('15478739913918560907921100372001')
-
-
+    # 获取交易单状态{"attachment":{"tradeNum":0.0,"status":4},"status":200,"message":null}status:0未成交，1部分成交，2已成交，4已撤单，5部分撤单, 404无此单
+    # data = bqex.order_status('15511547188257080902781100334975')
+    # null = 0
+    # data = eval(data)
+    # data = data["attachment"]['USDT_TRIN']['last']
     print(data)
